@@ -23,6 +23,8 @@ void tcl_put_pixels(int fd, u8 spi_data_tx[], u16 count, pixel* pixels) {
   u8* d;
   u8 flag;
 
+    system("/home/root/led0on.sh");
+
   d = spi_data_tx;
   *d++ = 0;
   *d++ = 0;
@@ -36,6 +38,8 @@ void tcl_put_pixels(int fd, u8 spi_data_tx[], u16 count, pixel* pixels) {
     *d++ = p->r;
   }
   spi_write(fd, spi_data_tx, d - spi_data_tx);
+
+    system("/home/root/led0off.sh");
 }
 
 
