@@ -162,13 +162,14 @@ class Client(object):
             return False
 
         # build OPC message
-        if len(self._pieces) != len(pixels) + 1:
-            self._pieces = [0] * (len(pixels)+1)
+        len_pixels = len(pixels)
+        if len(self._pieces) != len_pixels + 1:
+            self._pieces = [0] * (len_pixels+1)
         _pieces = self._pieces
         _chr = self._chr
-        len_hi_byte = int(len(pixels)*3 / 256)
-        len_lo_byte = (len(pixels)*3) % 256
-        header = _chr[channel] + _chr[0] + _chr[len_hi_byte] + _chr[len_lo_byte]
+        len_hi_byte = int(len_pixels*3 / 256)
+        len_lo_byte = (len_pixels*3) % 256
+        header = _chr[channel] + '\x00' + _chr[len_hi_byte] + _chr[len_lo_byte]
         _pieces[0] = header
         ii = 1
         for r, g, b in pixels:
@@ -198,5 +199,4 @@ class Client(object):
             self.disconnect()
 
         return True
-
 
