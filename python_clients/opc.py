@@ -73,7 +73,7 @@ class Client(object):
         self._fps_frame_counter = 0
 
         # chr() lookup table
-        self._chr = [chr(ii) for ii in range(255)]
+        self._chr = [chr(ii) for ii in range(256)]
         self._pieces = []
 
     def _debug(self, m):
@@ -163,7 +163,6 @@ class Client(object):
 
         # build OPC message
         if len(self._pieces) != len(pixels) + 1:
-            print 'making new _pieces'
             self._pieces = [0] * (len(pixels)+1)
         _pieces = self._pieces
         _chr = self._chr
