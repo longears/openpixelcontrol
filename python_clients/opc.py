@@ -72,6 +72,10 @@ class Client(object):
         self._last_fps_time = 0 
         self._fps_frame_counter = 0
 
+        # chr() lookup table
+        self._chr = [chr(ii) for ii in range(255)]
+        self._pieces = []
+
     def _debug(self, m):
         if self.verbose:
             print '    %s' % str(m)
@@ -158,16 +162,29 @@ class Client(object):
             return False
 
         # build OPC message
+        if len(self._pieces) != len(pixels) + 1:
+            print 'making new _pieces'
+            self._pieces = [0] * (len(pixels)+1)
+        _pieces = self._pieces
+        _chr = self._chr
         len_hi_byte = int(len(pixels)*3 / 256)
         len_lo_byte = (len(pixels)*3) % 256
-        header = chr(channel) + chr(0) + chr(len_hi_byte) + chr(len_lo_byte)
-        pieces = [header]
+        header = _chr[channel] + _chr[0] + _chr[len_hi_byte] + _chr[len_lo_byte]
+        _pieces[0] = header
+        ii = 1
         for r, g, b in pixels:
-            r = min(255, max(0, int(r)))
-            g = min(255, max(0, int(g)))
-            b = min(255, max(0, int(b)))
-            pieces.append(chr(r) + chr(g) + chr(b))
-        message = ''.join(pieces)
+            if r < 0: r = 0
+            elif r > 255: r = 255
+            else: r = int(r)
+            if g < 0: g = 0
+            elif g > 255: g = 255
+            else: g = int(g)
+            if b < 0: b = 0
+            elif b > 255: b = 255
+            else: b = int(b)
+            _pieces[ii] = _chr[r] + _chr[g] + _chr[b]
+            ii += 1
+        message = ''.join(_pieces)
 
         self._debug('put_pixels: sending pixels to server')
         try:
