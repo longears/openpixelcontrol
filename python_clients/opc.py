@@ -147,7 +147,7 @@ class Client(object):
         if self._fps_frame_counter > 0 and self._last_fps_time + 1 < now:
             if self._last_fps_time != 0:
                 spf = (now - self._last_fps_time) / self._fps_frame_counter
-                print ('%i ms per frame (%0.1f fps)'%(spf*1000, 1/spf))
+                print ('%0.1f ms per frame (%0.1f fps)'%(spf*1000, 1/spf))
             self._last_fps_time = now
             self._fps_frame_counter = 0
 
