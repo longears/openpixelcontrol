@@ -39,7 +39,7 @@ double camera_distance = 16.0;  // distance from origin, metres
 double camera_aspect = 1.0;  // will be updated to match window aspect ratio
 
 // Shape parameters
-#define SHAPE_THICKNESS 0.06  // thickness of points and lines, metres
+#define SHAPE_THICKNESS 0.10  // thickness of points and lines, metres
 
 // LED colours
 #define MAX_PIXELS 30000
@@ -175,7 +175,7 @@ void display() {
   shape* sh;
 
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-  draw_axes();
+  //draw_axes();
   GLUquadric* quad = gluNewQuadric();
   for (i = 0, sh = shapes; i < num_shapes; i++, sh++) {
     sh->draw(sh, quad);
@@ -332,7 +332,7 @@ void init(char* filename) {
     pixels[i].r = pixels[i].g = pixels[i].b = 1;
   }
   for (i = 0; i < 256; i++) {
-    xfer[i].r = xfer[i].g = xfer[i].b = 0.1 + i*0.9/256;
+    xfer[i].r = xfer[i].g = xfer[i].b = 0.05 + i*0.95/256;
   }
 }
 
