@@ -13,7 +13,10 @@ def remap(x, oldmin, oldmax, newmin, newmax):
         remap(math.sin(time.time()), -1, 1, 0, 256)
 
     """
-    zero_to_one = (x-oldmin) / (oldmax-oldmin)
+    if oldmax == oldmin:
+        zero_to_one = 0.5
+    else:
+        zero_to_one = (x-oldmin) / (oldmax-oldmin)
     return zero_to_one*(newmax-newmin) + newmin
 
 def clamp(x, minn, maxx):
