@@ -33,7 +33,7 @@ Recommended use:
 
 """
 
-import socket
+import socket, time
 
 class Client(object):
 
@@ -66,7 +66,11 @@ class Client(object):
         self._ip, self._port = server_ip_port.split(':')
         self._port = int(self._port)
 
-        self._socket = None  # will be None when we're not connected
+        self._socket = None      # will be None when we're not connected
+
+        self._last_times = []    # list of last 5 times a frame was submitted
+        self._last_fps_time = 0 
+        self._fps_frame_counter = 0
 
     def _debug(self, m):
         if self.verbose:
@@ -113,7 +117,7 @@ class Client(object):
         if not self._long_connection:
             self.disconnect()
         return success
-
+    
     def put_pixels(self, pixels, channel=0):
         """Send the list of pixel colors to the OPC server on the given channel.
 
@@ -137,6 +141,16 @@ class Client(object):
         LED at a time (unless it's the first one).
 
         """
+
+        now = time.time()
+        self._fps_frame_counter += 1
+        if self._fps_frame_counter > 0 and self._last_fps_time + 1 < now:
+            if self._last_fps_time != 0:
+                spf = (now - self._last_fps_time) / self._fps_frame_counter
+                print ('%i ms per frame (%0.1f fps)'%(spf*1000, 1/spf))
+            self._last_fps_time = now
+            self._fps_frame_counter = 0
+
         self._debug('put_pixels: connecting')
         is_connected = self._ensure_connected()
         if not is_connected:
