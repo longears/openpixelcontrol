@@ -5,7 +5,7 @@ import optparse
 import sys
 import time
 
-import opc_client
+import opc
 
 
 parser = optparse.OptionParser()
@@ -17,7 +17,7 @@ parser.add_option('-f', '--fps', dest='fps', default=1e9,
                     action='store', type='int', help='frames per second')
 
 options, args = parser.parse_args()
-socket = opc_client.get_socket(options.server)
+client = opc.Client(options.server)
 
 black_white = [(0, 0, 0), (2, 2, 2)]
 rgb_bright = [(255, 0, 0), (0, 255, 0), (0, 0, 255)]
@@ -42,7 +42,7 @@ while True:
             pixels[0] = black_white[(frame % 10)/5]
             pixels[1] = black_white[(frame % 100)/50]
             pixels[2] = black_white[(frame % 1000)/500]
-            opc_client.put_pixels(socket, 0, pixels)
+            client.put_pixels(pixels, channel=0)
             pixels[i] = dim
             frame += 1
             if frame % 100 == 0:
