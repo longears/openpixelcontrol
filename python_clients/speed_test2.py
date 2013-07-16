@@ -89,7 +89,7 @@ def main():
         pixels.append([0,0,0])
 
 #     while True:
-    for ii in xrange(300):
+    for ii in xrange(1000):
         t = time.time() - start_time
         for ii in xrange(n_pixels):
             pct = ii / n_pixels
