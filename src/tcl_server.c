@@ -52,7 +52,7 @@ int main(int argc, char** argv) {
   time_t t;
 
   get_speed_and_port(&spi_speed_hz, &port, argc, argv);
-  spi_fd = init_spidev("/dev/spidev2.0", spi_speed_hz);
+  spi_fd = init_spidev("/dev/spidev1.0", spi_speed_hz);
   if (spi_fd < 0) {
     return 1;
   }

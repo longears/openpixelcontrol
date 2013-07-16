@@ -4,7 +4,7 @@ ifeq ($(platform),Darwin)
   ALL=bin/dummy_client bin/dummy_server bin/gl_server
   GL_OPTS=-framework OpenGL -framework GLUT
 else ifeq ($(platform),Linux)
-  ALL=bin/dummy_client bin/dummy_server bin/tcl_server bin/ws2801_server bin/gl_server
+  ALL=bin/dummy_client bin/dummy_server bin/tcl_server # bin/ws2801_server bin/gl_server
   GL_OPTS=-lGL -lglut -lGLU
 endif
 
