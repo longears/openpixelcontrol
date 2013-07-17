@@ -2,48 +2,52 @@
 #include "opc.h"
 
 #define POST_TX_DELAY_USECS 1000
-// I'm seeing flickering at speeds above ~6mhz. Although the 
-// WS2801 datasheet lists a max rate of 25mhz, anecdotal evidence 
-// from forum posts suggests that most people have had trouble 
-// obtaining that in practice.
-#define WS2801_DEFAULT_SPEED 4000000
+#define LPD8806_DEFAULT_SPEED 2000000
 
-// Different WS2801 strips expect different input color orderings.
+// Different LPD8806 strips expect different input color orderings.
 typedef enum { RGB=0, GRB=1, BGR=2 } order_t;
-#define DEFAULT_INPUT_ORDER RGB
+#define DEFAULT_INPUT_ORDER GRB
 
 static int spi_fd = -1;
-static u8 spi_data_tx[1 << 16];
-static u32 spi_speed_hz = WS2801_DEFAULT_SPEED;
+static u8 spi_data_tx[1 << 16 + 5];
+static u32 spi_speed_hz = LPD8806_DEFAULT_SPEED;
 static order_t rgb_order = DEFAULT_INPUT_ORDER;
 
-void ws2801_put_pixels(int fd, u8 spi_data_tx[], u32 spi_speed_hz, 
+void lpd8806_put_pixels(int fd, u8 spi_data_tx[], u32 spi_speed_hz, 
                        u16 count, pixel* pixels, order_t order) {
   int i;
   pixel* p;
   u8* d;
   
   d = spi_data_tx;
+
+  *d++ = 0;
+  *d++ = 0;
+  *d++ = 0;
+
   for (i = 0, p = pixels; i < count; i++, p++) {
     switch (order)
     {
-    case RGB:
-      *d++ = p->r;
-      *d++ = p->g;
-      *d++ = p->b;
-      break;
+    //case RGB:
+    //  *d++ = 128 | ((p->r) >> 1);
+    //  *d++ = 128 | ((p->g) >> 1);
+    //  *d++ = 128 | ((p->b) >> 1);
+    //  break;
     case GRB:
-      *d++ = p->g;
-      *d++ = p->r;
-      *d++ = p->b;
+      *d++ = 129; //128 | ((p->g) >> 1);
+      *d++ = 129; //128 | ((p->r) >> 1);
+      *d++ = 129; //128 | ((p->b) >> 1);
       break;
-    case BGR:
-      *d++ = p->b;
-      *d++ = p->g;
-      *d++ = p->r;
-      break;
+    //case BGR:
+    //  *d++ = 128 | ((p->b) >> 1);
+    //  *d++ = 128 | ((p->g) >> 1);
+    //  *d++ = 128 | ((p->r) >> 1);
+    //  break;
     }
   }
+
+  *d++ = 0;
+
   spi_transfer(fd, spi_speed_hz, spi_data_tx, 0, 
       d - spi_data_tx, POST_TX_DELAY_USECS);
 }
@@ -52,7 +56,7 @@ void ws2801_put_pixels(int fd, u8 spi_data_tx[], u32 spi_speed_hz,
 void handler(u8 address, u16 count, pixel* pixels) {
   fprintf(stderr, "%d ", count);
   fflush(stderr);
-  ws2801_put_pixels(spi_fd, spi_data_tx, spi_speed_hz, count, 
+  lpd8806_put_pixels(spi_fd, spi_data_tx, spi_speed_hz, count, 
     pixels, rgb_order);
 }
 
