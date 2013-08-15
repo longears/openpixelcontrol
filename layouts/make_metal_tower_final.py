@@ -115,15 +115,15 @@ points += rightRow
 points += reversed(leftRow)
 points += leftColumn
 
-# helper marker dots
-points.append((-1.5 * SHADE_CELL_WIDTH, -SHADE_DEPTH, -TABLE_HEIGHT))
-points.append((1.5 * SHADE_CELL_WIDTH, -SHADE_DEPTH, -TABLE_HEIGHT))
-points.append((-0.5 * SHADE_CELL_WIDTH, -SHADE_DEPTH, -TABLE_HEIGHT))
-points.append((0.5 * SHADE_CELL_WIDTH, -SHADE_DEPTH, -TABLE_HEIGHT))
-points.append((-0.5 * SHADE_CELL_WIDTH, -SHADE_DEPTH, -TABLE_HEIGHT+SHADE_CELL_HEIGHT))
-points.append((0.5 * SHADE_CELL_WIDTH, -SHADE_DEPTH, -TABLE_HEIGHT+SHADE_CELL_HEIGHT))
-points.append((HALF_TABLE_WIDTH, 0, -TABLE_HEIGHT))
-points.append((-HALF_TABLE_WIDTH, 0, -TABLE_HEIGHT))
+# # helper marker dots
+# points.append((-1.5 * SHADE_CELL_WIDTH, -SHADE_DEPTH, -TABLE_HEIGHT))
+# points.append((1.5 * SHADE_CELL_WIDTH, -SHADE_DEPTH, -TABLE_HEIGHT))
+# points.append((-0.5 * SHADE_CELL_WIDTH, -SHADE_DEPTH, -TABLE_HEIGHT))
+# points.append((0.5 * SHADE_CELL_WIDTH, -SHADE_DEPTH, -TABLE_HEIGHT))
+# points.append((-0.5 * SHADE_CELL_WIDTH, -SHADE_DEPTH, -TABLE_HEIGHT+SHADE_CELL_HEIGHT))
+# points.append((0.5 * SHADE_CELL_WIDTH, -SHADE_DEPTH, -TABLE_HEIGHT+SHADE_CELL_HEIGHT))
+# points.append((HALF_TABLE_WIDTH, 0, -TABLE_HEIGHT))
+# points.append((-HALF_TABLE_WIDTH, 0, -TABLE_HEIGHT))
 
 # transform so the circle is at the origin
 points = transform(points, (0,0,-CIRCLE_HEIGHT))
