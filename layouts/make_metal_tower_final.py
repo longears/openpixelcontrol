@@ -68,33 +68,42 @@ def row(start, direction, count):
 
 FT_TO_M = 0.3048
 
-HALF_TABLE_WIDTH = 4 * FT_TO_M
-SHADE_CELL_WIDTH = 10 * FT_TO_M
-SHADE_CELL_HEIGHT = 8 * FT_TO_M
-SHADE_DEPTH = 7 * FT_TO_M
-CIRCLE_HEIGHT = 1.7  # tabletop to center of circle
 STRIP_LEN = 5
 LEDS_PER_METER = 32
 LEDS_PER_FOOT = int(LEDS_PER_METER * FT_TO_M) # rounded
 LEDS_PER_STRIP = 160
 METERS_PER_LED = 1 / LEDS_PER_METER
+
+HALF_TABLE_WIDTH = 4 * FT_TO_M
+SHADE_CELL_WIDTH = 10 * FT_TO_M
+SHADE_CELL_HEIGHT = 8 * FT_TO_M
+SHADE_DEPTH = 7 * FT_TO_M
+CIRCLE_HEIGHT = 1.7  # tabletop to center of circle
+TOWER_HEIGHT = 6 * FT_TO_M
+ARCH_ARCLENGTH = STRIP_LEN - TOWER_HEIGHT
 CORNER_OFFSET_LEDS = 1 * LEDS_PER_FOOT # how many leds to shift the strips around the corners
 TABLE_HEIGHT = 3 * FT_TO_M
 
+LEDS_ABOVE_ARCH = int(LEDS_PER_STRIP * ARCH_ARCLENGTH/STRIP_LEN)
+LEDS_BELOW_ARCH = LEDS_PER_STRIP - LEDS_ABOVE_ARCH
+
 def computeXgivenR(r):
-    theta = STRIP_LEN / r
+    theta = ARCH_ARCLENGTH / r
     x = r - r * math.cos(theta)
     return x
 
 CURVE_RADIUS = binarySearch(computeXgivenR, 2.3, 50, HALF_TABLE_WIDTH)
-CURVE_THETA = STRIP_LEN / CURVE_RADIUS
+CURVE_THETA = ARCH_ARCLENGTH / CURVE_RADIUS
 
 # origin is center front bottom of arch, on the ground
 
 # arch
-leftCurvePoints = transform(    makeCircleSegment(rad = CURVE_RADIUS, striplen = STRIP_LEN, numLeds = LEDS_PER_STRIP),
-                                (-CURVE_RADIUS+HALF_TABLE_WIDTH,0,TABLE_HEIGHT)    )
+leftCurvePoints = transform(    makeCircleSegment(rad = CURVE_RADIUS, striplen = ARCH_ARCLENGTH, numLeds = LEDS_ABOVE_ARCH),
+                                (-CURVE_RADIUS+HALF_TABLE_WIDTH,0,TOWER_HEIGHT)    )
+leftTowerPoints = row( (HALF_TABLE_WIDTH, 0, 0), (0,0,1), LEDS_BELOW_ARCH)
+
 rightCurvePoints = scale(leftCurvePoints, (-1,1,1))
+rightTowerPoints = scale(leftTowerPoints, (-1,1,1))
 
 # circle
 circlePoints = transform(   makeCircleSegment(rad = STRIP_LEN / (2*math.pi), striplen = STRIP_LEN, numLeds = LEDS_PER_STRIP, degreeOffset = -90),
@@ -109,22 +118,24 @@ leftRow = scale(rightRow, (-1,1,1))
 # assemble in correct order
 points = []
 points += circlePoints
+points += leftTowerPoints
 points += leftCurvePoints
 points += reversed(rightCurvePoints)
+points += reversed(rightTowerPoints)
 points += reversed(rightColumn)
 points += rightRow
 points += reversed(leftRow)
 points += leftColumn
 
-# add helper marker dots
-points.append((-1.5 * SHADE_CELL_WIDTH, -SHADE_DEPTH, 0))
-points.append((1.5 * SHADE_CELL_WIDTH, -SHADE_DEPTH, 0))
-points.append((-0.5 * SHADE_CELL_WIDTH, -SHADE_DEPTH, 0))
-points.append((0.5 * SHADE_CELL_WIDTH, -SHADE_DEPTH, 0))
-points.append((-0.5 * SHADE_CELL_WIDTH, -SHADE_DEPTH, SHADE_CELL_HEIGHT))
-points.append((0.5 * SHADE_CELL_WIDTH, -SHADE_DEPTH, SHADE_CELL_HEIGHT))
-points.append((HALF_TABLE_WIDTH, 0, 0))
-points.append((-HALF_TABLE_WIDTH, 0, 0))
+# # add helper marker dots
+# points.append((-1.5 * SHADE_CELL_WIDTH, -SHADE_DEPTH, 0))
+# points.append((1.5 * SHADE_CELL_WIDTH, -SHADE_DEPTH, 0))
+# points.append((-0.5 * SHADE_CELL_WIDTH, -SHADE_DEPTH, 0))
+# points.append((0.5 * SHADE_CELL_WIDTH, -SHADE_DEPTH, 0))
+# points.append((-0.5 * SHADE_CELL_WIDTH, -SHADE_DEPTH, SHADE_CELL_HEIGHT))
+# points.append((0.5 * SHADE_CELL_WIDTH, -SHADE_DEPTH, SHADE_CELL_HEIGHT))
+# points.append((HALF_TABLE_WIDTH, 0, 0))
+# points.append((-HALF_TABLE_WIDTH, 0, 0))
 
 # transform so the circle is at the origin
 points = transform(points, (0,0,-CIRCLE_HEIGHT-TABLE_HEIGHT))
