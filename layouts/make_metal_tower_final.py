@@ -1,13 +1,16 @@
 #!/usr/bin/env python
 
 from __future__ import division
-import math
+import math, sys
 
 # z is up
 # x is sideways
 # y is depth
 
 #================================================================================
+
+def debug(s):
+    sys.stderr.write(s + '\n')
 
 def binarySearch(fn, xmin, xmax, desiredY, epsilon = 0.001):
     """Given a function, find the x where it has the desired value desiredY = fn(x).
@@ -86,26 +89,24 @@ def computeXgivenR(r):
 CURVE_RADIUS = binarySearch(computeXgivenR, 2.3, 50, HALF_TABLE_WIDTH)
 CURVE_THETA = STRIP_LEN / CURVE_RADIUS
 
-# origin is center front bottom of arch, on the tabletop
+# origin is center front bottom of arch, on the ground
 
-leftCurvePoints = transform(    makeCircleSegment(CURVE_RADIUS, STRIP_LEN, LEDS_PER_STRIP),
-                                (-CURVE_RADIUS+HALF_TABLE_WIDTH,0,0)    )
+# arch
+leftCurvePoints = transform(    makeCircleSegment(rad = CURVE_RADIUS, striplen = STRIP_LEN, numLeds = LEDS_PER_STRIP),
+                                (-CURVE_RADIUS+HALF_TABLE_WIDTH,0,TABLE_HEIGHT)    )
 rightCurvePoints = scale(leftCurvePoints, (-1,1,1))
 
-circlePoints = transform(   makeCircleSegment(STRIP_LEN / (2*math.pi), STRIP_LEN, LEDS_PER_STRIP, -90),
-                            (0,0,CIRCLE_HEIGHT)    )
+# circle
+circlePoints = transform(   makeCircleSegment(rad = STRIP_LEN / (2*math.pi), striplen = STRIP_LEN, numLeds = LEDS_PER_STRIP, degreeOffset = -90),
+                            (0,0,CIRCLE_HEIGHT+TABLE_HEIGHT)    )
 
-# make shade parts.  origin is center front bottom of table, on the ground
-rightColumn = row( (-1.5 * SHADE_CELL_WIDTH, -SHADE_DEPTH, SHADE_CELL_HEIGHT), (0,0,-1), LEDS_PER_STRIP / 2 - CORNER_OFFSET_LEDS)
-rightRow = row( (-1.5 * SHADE_CELL_WIDTH, -SHADE_DEPTH, SHADE_CELL_HEIGHT), (1,0,0), LEDS_PER_STRIP / 2 + CORNER_OFFSET_LEDS)
-
-# move shade parts down by TABLE_HEIGHT so origin is on the tabletop to match the arch's origin
-rightColumn = transform(rightColumn, (0,0,-TABLE_HEIGHT))
-rightRow = transform(rightRow, (0,0,-TABLE_HEIGHT))
-
+# shade corners
+rightColumn = row( (-1.5 * SHADE_CELL_WIDTH, -SHADE_DEPTH, SHADE_CELL_HEIGHT), (0,0,-1), int(LEDS_PER_STRIP/2) - CORNER_OFFSET_LEDS)
+rightRow = row( (-1.5 * SHADE_CELL_WIDTH, -SHADE_DEPTH, SHADE_CELL_HEIGHT), (1,0,0), int(LEDS_PER_STRIP/2) + CORNER_OFFSET_LEDS)
 leftColumn = scale(rightColumn, (-1,1,1))
 leftRow = scale(rightRow, (-1,1,1))
 
+# assemble in correct order
 points = []
 points += circlePoints
 points += leftCurvePoints
@@ -115,18 +116,18 @@ points += rightRow
 points += reversed(leftRow)
 points += leftColumn
 
-# # helper marker dots
-# points.append((-1.5 * SHADE_CELL_WIDTH, -SHADE_DEPTH, -TABLE_HEIGHT))
-# points.append((1.5 * SHADE_CELL_WIDTH, -SHADE_DEPTH, -TABLE_HEIGHT))
-# points.append((-0.5 * SHADE_CELL_WIDTH, -SHADE_DEPTH, -TABLE_HEIGHT))
-# points.append((0.5 * SHADE_CELL_WIDTH, -SHADE_DEPTH, -TABLE_HEIGHT))
-# points.append((-0.5 * SHADE_CELL_WIDTH, -SHADE_DEPTH, -TABLE_HEIGHT+SHADE_CELL_HEIGHT))
-# points.append((0.5 * SHADE_CELL_WIDTH, -SHADE_DEPTH, -TABLE_HEIGHT+SHADE_CELL_HEIGHT))
-# points.append((HALF_TABLE_WIDTH, 0, -TABLE_HEIGHT))
-# points.append((-HALF_TABLE_WIDTH, 0, -TABLE_HEIGHT))
+# add helper marker dots
+points.append((-1.5 * SHADE_CELL_WIDTH, -SHADE_DEPTH, 0))
+points.append((1.5 * SHADE_CELL_WIDTH, -SHADE_DEPTH, 0))
+points.append((-0.5 * SHADE_CELL_WIDTH, -SHADE_DEPTH, 0))
+points.append((0.5 * SHADE_CELL_WIDTH, -SHADE_DEPTH, 0))
+points.append((-0.5 * SHADE_CELL_WIDTH, -SHADE_DEPTH, SHADE_CELL_HEIGHT))
+points.append((0.5 * SHADE_CELL_WIDTH, -SHADE_DEPTH, SHADE_CELL_HEIGHT))
+points.append((HALF_TABLE_WIDTH, 0, 0))
+points.append((-HALF_TABLE_WIDTH, 0, 0))
 
 # transform so the circle is at the origin
-points = transform(points, (0,0,-CIRCLE_HEIGHT))
+points = transform(points, (0,0,-CIRCLE_HEIGHT-TABLE_HEIGHT))
 
 # convert to JSON and print
 result = ['[']
